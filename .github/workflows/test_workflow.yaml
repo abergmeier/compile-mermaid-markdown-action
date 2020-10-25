@@ -1,0 +1,36 @@
+name: 'Compile Mermaid'
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - name: compile mermaid
+      uses: abergmeier/compile-mermaid-markdown-action@v1
+      with:
+        files: test/simple.md
+        output: 'output'
+      env:
+        REPLACE_CODEBLOCKS: 1
+
+    - name: show changes
+      run: |
+        git diff
+
+    - name: Commit files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Add changes" -a
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
